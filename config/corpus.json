@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository_url": "https://github.com/odoo/documentation.git",
+    "odoo_version": "19.0",
+    "language": "en",
+    "commit": "c9202e68ae702daec981b47d0b6055191084ffa2"
+  },
+  "scope": {
+    "sales": [
+      "content/applications/sales/sales.rst",
+      "content/applications/sales/sales"
+    ],
+    "inventory": [
+      "content/applications/inventory_and_mrp/inventory.rst",
+      "content/applications/inventory_and_mrp/inventory"
+    ]
+  }
+}
