@@ -3,3 +3,10 @@ name = "odoo-functional-rag-backend"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = []
+
+[dependency-groups]
+parser-spike = [
+    "docutils==0.21.2",
+    "sphinx==8.2.3",
+    "sphinx-tabs==3.5.0",
+]
