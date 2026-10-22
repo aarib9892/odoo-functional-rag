@@ -1,0 +1,1617 @@
+{
+  "schema_version": 1,
+  "benchmark_version": "m12-1.0",
+  "prepared_on": "2026-10-22",
+  "status": "accepted_by_user",
+  "source": {
+    "repository_url": "https://github.com/odoo/documentation.git",
+    "odoo_version": "19.0",
+    "language": "en",
+    "commit": "c9202e68ae702daec981b47d0b6055191084ffa2"
+  },
+  "candidate_manifest_fingerprint": "d2b2ef3824b6a6c78ceaafbc95d0ab146862493d13b8709f0dd60230fcbe1e2b",
+  "counts": {
+    "direct": 12,
+    "workflow": 8,
+    "ambiguous": 5,
+    "unanswerable": 5
+  },
+  "evidence_semantics": {
+    "groups": "Each required group is a distinct necessary fact. All required groups must be covered.",
+    "target_match": "all means all listed spans contribute; any means alternative spans are sufficient.",
+    "optional": "required=false provides optional context and is not required for retrieval recall.",
+    "boundary_cases": "Unanswerable cases have no gold passage for the requested unsupported answer. Listed spans support only a bounded explanation.",
+    "provenance": "One-based inclusive source lines and raw-file hashes at the reported commit. No generated chunk IDs.",
+    "scoring": "No retrieval score or quality threshold has been established. Ambiguous and unanswerable cases primarily test behavior, not positive-answer recall."
+  },
+  "split_policy": {
+    "unit": "query_family",
+    "counts": {
+      "development": 23,
+      "holdout": 7
+    },
+    "limitation": "All cases and evidence were visible to the assistant author and are supplied to the reviewer. This is an author-visible holdout, not a blind independent test. Families are disjoint, but the small sets share source documents and related domain knowledge; do not claim statistical generalization. This version is frozen before retrieval tuning.",
+    "frozen": true
+  },
+  "cases": [
+    {
+      "id": "M12-DRAFT-001",
+      "type": "direct",
+      "question": "I changed Sales settings to Invoice what is delivered. Do existing products change automatically, and where do I update them?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "The default applies to newly created products; existing products need a manual change.",
+        "Open Sales → Products → Products, select the product and change Invoicing Policy under General Information."
+      ],
+      "forbidden_claims": [
+        "All existing products or past orders are retroactively changed."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Default versus existing products",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Opening configuration",
+              "line_start": 25,
+              "line_end": 31,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        },
+        {
+          "fact": "Existing-product update",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Changing the invoicing policy for existing products",
+              "line_start": 45,
+              "line_end": 48,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-002",
+      "type": "workflow",
+      "question": "A confirmed sales order is for 10 units using Delivered quantities. Six have been delivered and validated, none invoiced, and four will ship later. What quantities can I invoice now and later?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Create a regular invoice for the six validated delivered units now.",
+        "Invoice the other four after their later delivery is validated, assuming no intervening returns or invoicing."
+      ],
+      "forbidden_claims": [
+        "All ten are invoiceable merely because the order is confirmed.",
+        "Validation automatically creates or pays an invoice."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Delivery prerequisite",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Invoice delivered quantity workflow",
+              "line_start": 109,
+              "line_end": 118,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        },
+        {
+          "fact": "Staged invoicing",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Partial-delivery example",
+              "line_start": 128,
+              "line_end": 133,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "10/6/4 applies the documented rule to a new example; the source example is 50/40/10.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-003",
+      "type": "direct",
+      "question": "Can I enable Automatic Invoice on online payment while using Invoice what is delivered?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "The selected documentation explicitly says this combination is unavailable.",
+        "Regular draft invoices require the delivery order to be processed and validated."
+      ],
+      "forbidden_claims": [
+        "The restriction proves all online payment order confirmation is unavailable.",
+        "A retrieval miss proves a feature is unsupported."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Explicit restriction",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Important: Automatic Invoice",
+              "line_start": 36,
+              "line_end": 40,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-004",
+      "type": "workflow",
+      "question": "My confirmed order is for 10 physical units using Delivered quantities, with nothing invoiced. I am following the documented shipment workflow, and the delivery operation type has Create Backorder set to Ask. Only six units are shipping now. How do I validate six, keep four for later, and invoice six?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Prepare and record the six units actually shipping now.",
+        "Validate and choose Create Backorder in the Ask flow; the four remaining units go to a later delivery order.",
+        "Return to the sales order and create a regular invoice for the six delivered units.",
+        "Later delivered quantities can be invoiced after validation."
+      ],
+      "forbidden_claims": [
+        "Record four as the immediate shipment quantity.",
+        "Every backorder configuration shows the popup.",
+        "A backorder automatically creates the invoice.",
+        "Packages must be enabled for every possible backorder workflow."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Backorder policy condition",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/warehouses_storage/inventory_management/operation_type.rst",
+              "section": "Create Backorder setting",
+              "line_start": 35,
+              "line_end": 38,
+              "sha256": "f544835cfc835c05867ed5302566b59fd0a6d5ad46f37ecef0ce9cf5df15a27a"
+            }
+          ]
+        },
+        {
+          "fact": "Immediate shipment and later order",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/setup_configuration/multipack.rst",
+              "section": "Create a backorder for items to be shipped later",
+              "line_start": 78,
+              "line_end": 90,
+              "sha256": "a77de888a49f9136b0f1fa4d7bd48570231075e7675e4cd3a7917f577d629383"
+            }
+          ]
+        },
+        {
+          "fact": "Invoice after validated delivery",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Invoice delivered quantity workflow",
+              "line_start": 109,
+              "line_end": 118,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        },
+        {
+          "fact": "Staged invoice quantities",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Partial-delivery example",
+              "line_start": 128,
+              "line_end": 133,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "Refines earlier draft 004 with the newly reviewed Ask condition. The arithmetic is an application of the documented rules.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-005",
+      "type": "direct",
+      "question": "All items in one delivery order will ship together, but they need two physical packages. Does that alone require a backorder?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "No. One delivery order can contain multiple packages.",
+        "A backorder handles items being shipped later."
+      ],
+      "forbidden_claims": [
+        "One package requires one delivery order.",
+        "Two packages necessarily mean a partial delivery."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Multiple packages on one order",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/setup_configuration/multipack.rst",
+              "section": "Introduction",
+              "line_start": 5,
+              "line_end": 8,
+              "sha256": "a77de888a49f9136b0f1fa4d7bd48570231075e7675e4cd3a7917f577d629383"
+            }
+          ]
+        },
+        {
+          "fact": "Backorder purpose",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/setup_configuration/multipack.rst",
+              "section": "Create a backorder for items to be shipped later",
+              "line_start": 78,
+              "line_end": 79,
+              "sha256": "a77de888a49f9136b0f1fa4d7bd48570231075e7675e4cd3a7917f577d629383"
+            }
+          ]
+        }
+      ],
+      "query_family": "package_meaning",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-006",
+      "type": "direct",
+      "question": "A customer returns an item after invoicing. Is a warehouse Reverse Transfer alone enough to complete the invoice correction?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "No. The documented after-invoicing flow uses a Reverse Transfer together with a Credit Note.",
+        "The physical return and invoice correction are separate operations."
+      ],
+      "forbidden_claims": [
+        "A warehouse return alone refunds or cancels the posted invoice."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "After-invoicing branch",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/products_prices/returns.rst",
+              "section": "After invoicing",
+              "line_start": 66,
+              "line_end": 71,
+              "sha256": "67832723af18cb48b5b1eba73f90319e37c02ab5ffeb4423a851cabfc233388b"
+            }
+          ]
+        }
+      ],
+      "query_family": "returns_refunds",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-007",
+      "type": "ambiguous",
+      "question": "The customer wants to return two delivered items. What should I do?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "clarify",
+      "expected_answer_points": [
+        "Ask whether the invoice has been sent or validated, and whether a monetary refund is needed.",
+        "Explain conditionally that the physical return is a Reverse Transfer, while an invoiced return also needs credit-note handling."
+      ],
+      "forbidden_claims": [
+        "Assume the invoice status.",
+        "Give one unconditional return/refund procedure."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Before-invoicing branch",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/products_prices/returns.rst",
+              "section": "Before invoicing",
+              "line_start": 13,
+              "line_end": 17,
+              "sha256": "67832723af18cb48b5b1eba73f90319e37c02ab5ffeb4423a851cabfc233388b"
+            }
+          ]
+        },
+        {
+          "fact": "After-invoicing branch",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/products_prices/returns.rst",
+              "section": "After invoicing",
+              "line_start": 66,
+              "line_end": 71,
+              "sha256": "67832723af18cb48b5b1eba73f90319e37c02ab5ffeb4423a851cabfc233388b"
+            }
+          ]
+        }
+      ],
+      "query_family": "returns_refunds",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-008",
+      "type": "unanswerable",
+      "question": "I confirmed a credit note. Will the refund arrive in the customer bank account tomorrow?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "insufficient_evidence",
+      "expected_answer_points": [
+        "The documentation does not establish bank settlement timing or the status of this real payment.",
+        "A credit note alone does not prove money was sent; the page calls for registering payment when money is refunded.",
+        "Ask for the payment status/provider or bank information needed to investigate."
+      ],
+      "forbidden_claims": [
+        "Guarantee tomorrow or any settlement date.",
+        "A confirmed credit note proves a completed bank refund."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Monetary refund requires additional action",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/finance/accounting/customer_invoices/credit_notes.rst",
+              "section": "Opening note",
+              "line_start": 19,
+              "line_end": 22,
+              "sha256": "49ed30d1777701d4fc4a48a6a48839df7c18a4641a01f0d8735cf6e85a093d41"
+            }
+          ]
+        }
+      ],
+      "query_family": "returns_refunds",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "Evidence supports the limited explanation; it is not a positive evidence target for a bank-arrival prediction.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-009",
+      "type": "direct",
+      "question": "What is the difference between Reverse and Reverse and Create Invoice when creating a customer credit note?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Reverse opens an editable draft credit note; product/quantity can be adjusted before confirmation, including for a partial refund.",
+        "Reverse and Create Invoice validates and reconciles the credit note with the related invoice and opens a new draft invoice."
+      ],
+      "forbidden_claims": [
+        "Both actions leave the same editable draft credit note.",
+        "The second action merely sends cash to the customer."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Reverse",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/finance/accounting/customer_invoices/credit_notes.rst",
+              "section": "Issue a customer credit note",
+              "line_start": 36,
+              "line_end": 38,
+              "sha256": "49ed30d1777701d4fc4a48a6a48839df7c18a4641a01f0d8735cf6e85a093d41"
+            }
+          ]
+        },
+        {
+          "fact": "Reverse and Create invoice",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/finance/accounting/customer_invoices/credit_notes.rst",
+              "section": "Issue a customer credit note",
+              "line_start": 39,
+              "line_end": 41,
+              "sha256": "49ed30d1777701d4fc4a48a6a48839df7c18a4641a01f0d8735cf6e85a093d41"
+            }
+          ]
+        }
+      ],
+      "query_family": "returns_refunds",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "Use the dedicated credit-note explanation; returns.rst 112–115 compresses the actions in a way that can mislead. Live UI behavior is untested.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-010",
+      "type": "workflow",
+      "question": "Five units were delivered and invoiced. The customer returns two, and I need to record their physical return and a credit for those two. What is the documented process?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Open the validated delivery from the sales order, choose Return and set the returned quantity to two.",
+        "Create the return operation and validate it when the goods are received; Delivered updates accordingly.",
+        "Open the invoice, choose Credit Note and enter the reason/journal/date as appropriate.",
+        "Use Reverse, adjust the draft to the two returned units and confirm it.",
+        "If money is to be refunded, payment registration is a separate step."
+      ],
+      "forbidden_claims": [
+        "Credit all five by default without adjustment.",
+        "Physical validation alone changes the invoice or sends money."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Physical return",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/products_prices/returns.rst",
+              "section": "After invoicing",
+              "line_start": 84,
+              "line_end": 93,
+              "sha256": "67832723af18cb48b5b1eba73f90319e37c02ab5ffeb4423a851cabfc233388b"
+            }
+          ]
+        },
+        {
+          "fact": "Partial credit",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/finance/accounting/customer_invoices/credit_notes.rst",
+              "section": "Issue a customer credit note",
+              "line_start": 29,
+              "line_end": 38,
+              "sha256": "49ed30d1777701d4fc4a48a6a48839df7c18a4641a01f0d8735cf6e85a093d41"
+            }
+          ]
+        },
+        {
+          "fact": "If refunding money",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/finance/accounting/customer_invoices/credit_notes.rst",
+              "section": "Opening note",
+              "line_start": 19,
+              "line_end": 22,
+              "sha256": "49ed30d1777701d4fc4a48a6a48839df7c18a4641a01f0d8735cf6e85a093d41"
+            }
+          ]
+        }
+      ],
+      "query_family": "returns_refunds",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "The two-unit quantity is a scenario applying the documented partial-credit option, not a copied worked example.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-011",
+      "type": "direct",
+      "question": "Is a down-payment invoice the same as paying one invoice through several installments?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "No. Down-payment invoices differ from payment terms/installment plans.",
+        "Multiple installments for a single invoice use payment terms with an installment plan."
+      ],
+      "forbidden_claims": [
+        "Provide unreviewed payment-term setup instructions.",
+        "Treat both choices as the same invoicing structure."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Explicit distinction",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Opening note",
+              "line_start": 19,
+              "line_end": 23,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        }
+      ],
+      "query_family": "down_payment_lifecycle",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-012",
+      "type": "direct",
+      "question": "Why does Create Invoice remain visible after a 100% down payment?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "The source distinguishes a 100% down payment from completion through a regular invoice.",
+        "Another invoice is required to complete the sales order, so Create Invoice remains available."
+      ],
+      "forbidden_claims": [
+        "Charge another 100% as a new unpaid balance.",
+        "A full down payment necessarily completes the regular-invoice lifecycle."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "100% down-payment distinction",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Types of down payments",
+              "line_start": 76,
+              "line_end": 80,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        }
+      ],
+      "query_family": "down_payment_lifecycle",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-013",
+      "type": "workflow",
+      "question": "For a product using Ordered quantities, how do I invoice a 50% down payment and later invoice the remaining balance?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Confirm the quotation, choose Create Invoice → Down payment (percentage), and enter 50.",
+        "Create Draft, review and Confirm; record payment through Pay/Create Payment when appropriate.",
+        "Later choose Create Invoice → Regular invoice, review the remaining Amount Due, create and confirm the draft, then record payment.",
+        "In Payment versus Paid depends on the database/payment confirmation configuration described by the source."
+      ],
+      "forbidden_claims": [
+        "The second invoice should collect the full order total again.",
+        "In Payment always proves settlement.",
+        "Apply this example unconditionally to Delivered quantities."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Policy and initial percentage",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Example 1: 50% down payment",
+              "line_start": 95,
+              "line_end": 108,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        },
+        {
+          "fact": "Posting and payment",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Example 1: 50% down payment",
+              "line_start": 115,
+              "line_end": 139,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        },
+        {
+          "fact": "Remaining regular invoice",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Example 1: 50% down payment",
+              "line_start": 144,
+              "line_end": 166,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        }
+      ],
+      "query_family": "down_payment_lifecycle",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-014",
+      "type": "ambiguous",
+      "question": "My customer wants to pay part now and the rest later. How should I configure that?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "clarify",
+      "expected_answer_points": [
+        "Ask whether this means installments on one invoice or a separate advance/down-payment invoice followed by later invoicing.",
+        "Explain the documented distinction before prescribing a workflow."
+      ],
+      "forbidden_claims": [
+        "Assume down payments are required.",
+        "Assume installment terms are required.",
+        "Invent detailed payment-term configuration from an unreviewed page."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Single invoice with installments",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Opening note",
+              "line_start": 19,
+              "line_end": 23,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        },
+        {
+          "fact": "Down-payment invoice options",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Create invoices",
+              "line_start": 37,
+              "line_end": 42,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        },
+        {
+          "fact": "Later regular invoice",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Example 1: 50% down payment",
+              "line_start": 137,
+              "line_end": 152,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        }
+      ],
+      "query_family": "down_payment_lifecycle",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-015",
+      "type": "direct",
+      "question": "Do I need Multi-Step Routes for one-step shipping, and why might the Shipments settings be missing from my warehouse form?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "The default one-step process does not require Multi-Step Routes.",
+        "The documentation says enabling it exposes Shipments settings and also enables Storage Locations."
+      ],
+      "forbidden_claims": [
+        "It is always required to perform one-step delivery.",
+        "Enabling it automatically changes all shipments to multiple steps."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Default versus settings visibility",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_one_step.rst",
+              "section": "Configuration",
+              "line_start": 33,
+              "line_end": 43,
+              "sha256": "29425abbaadb67d9bb0dec2740016cdaa76369e4edf3f87cee7d94578ea685e8"
+            }
+          ]
+        }
+      ],
+      "query_family": "warehouse_routes",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-016",
+      "type": "direct",
+      "question": "Can one warehouse receive goods in one step but deliver them in three steps?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Yes. Incoming and outgoing shipment step counts can differ; the source gives this exact example."
+      ],
+      "forbidden_claims": [
+        "Both directions must use the same count.",
+        "The user warehouse is already configured that way."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Independent step counts",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_one_step.rst",
+              "section": "Opening tip",
+              "line_start": 13,
+              "line_end": 17,
+              "sha256": "29425abbaadb67d9bb0dec2740016cdaa76369e4edf3f87cee7d94578ea685e8"
+            }
+          ]
+        }
+      ],
+      "query_family": "warehouse_routes",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-017",
+      "type": "workflow",
+      "question": "My warehouse uses one-step outgoing shipments. A confirmed sales order for physical goods uses Delivered quantities; all units are ready to ship and none have been invoiced. What steps come before the regular invoice?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Open the sales order Delivery smart button.",
+        "Record the quantity actually being shipped; for this full shipment it matches Demand.",
+        "Validate the delivery; it becomes Done and Delivered updates on the sales order.",
+        "Return to the sales order and create the regular invoice."
+      ],
+      "forbidden_claims": [
+        "Sales-order confirmation alone completes the delivery.",
+        "Always copy full Demand for a partial shipment.",
+        "Delivery validation automatically creates or pays the invoice."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Open delivery",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_one_step.rst",
+              "section": "Create sales order",
+              "line_start": 118,
+              "line_end": 122,
+              "sha256": "29425abbaadb67d9bb0dec2740016cdaa76369e4edf3f87cee7d94578ea685e8"
+            }
+          ]
+        },
+        {
+          "fact": "Process delivery",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_one_step.rst",
+              "section": "Process delivery",
+              "line_start": 131,
+              "line_end": 144,
+              "sha256": "29425abbaadb67d9bb0dec2740016cdaa76369e4edf3f87cee7d94578ea685e8"
+            }
+          ]
+        },
+        {
+          "fact": "Regular invoice prerequisite",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Invoice delivered quantity workflow",
+              "line_start": 109,
+              "line_end": 122,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-018",
+      "type": "direct",
+      "question": "For Goods, how do tracked and untracked products differ in on-hand/forecast quantities, and can both still appear on transfers?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Tracked goods have on-hand and forecast quantity tracking; untracked goods do not have those tracked quantities.",
+        "Both tracked and untracked goods can be used on transfers."
+      ],
+      "forbidden_claims": [
+        "Untracked goods cannot move through transfers.",
+        "Untracked means the product has zero physical stock."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "On-hand and forecast table rows",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/product_management/configure/type.rst",
+              "section": "Inventory operations by product type",
+              "line_start": 137,
+              "line_end": 149,
+              "sha256": "2c09f40a0d18014bd64fdb77c8d7ec28e43bb45307decde6579f99367d80cc19"
+            }
+          ]
+        },
+        {
+          "fact": "Transfer table row",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/product_management/configure/type.rst",
+              "section": "Inventory operations by product type",
+              "line_start": 170,
+              "line_end": 172,
+              "sha256": "2c09f40a0d18014bd64fdb77c8d7ec28e43bb45307decde6579f99367d80cc19"
+            }
+          ]
+        }
+      ],
+      "query_family": "product_tracking",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-019",
+      "type": "direct",
+      "question": "What is the difference between an Inventory package and product packaging such as a six-pack?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "A package is a physical container that can hold multiple products.",
+        "Packaging describes a product-specific quantity, such as a six-pack, and is defined for that product."
+      ],
+      "forbidden_claims": [
+        "The two terms are interchangeable.",
+        "A product packaging definition can freely mix different products."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Package",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/product_management/configure/package.rst",
+              "section": "Introduction",
+              "line_start": 7,
+              "line_end": 16,
+              "sha256": "a1e3153f3543e352fe4983eb06685a571b0dbc45eef7b0ed2ca31c1e8af3e979"
+            }
+          ]
+        },
+        {
+          "fact": "Packaging",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/product_management/configure/packaging.rst",
+              "section": "Introduction",
+              "line_start": 7,
+              "line_end": 12,
+              "sha256": "79253e00ee854ab3f5ee0e71a2ea3d3d795143b8671c2e2554ceb36f2ab13f70"
+            }
+          ]
+        }
+      ],
+      "query_family": "package_meaning",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-020",
+      "type": "direct",
+      "question": "Pro-forma invoices are enabled, but I have already sent a down-payment invoice for this sales order. Why can I not send its pro-forma invoice?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "The page explicitly lists a previously sent down-payment invoice as a restriction on sending a pro-forma for that order."
+      ],
+      "forbidden_claims": [
+        "Assume the feature is disabled despite the question.",
+        "All new subscription quotations are excluded.",
+        "A pro-forma itself is a payment request."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Down-payment restriction",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/proforma.rst",
+              "section": "Send pro-forma invoice",
+              "line_start": 36,
+              "line_end": 43,
+              "sha256": "5aa0ccdf418859cef27ca0c40140c894666ee7bc4d517eb5041bb9b185223bd6"
+            }
+          ]
+        }
+      ],
+      "query_family": "proforma_availability",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-021",
+      "type": "workflow",
+      "question": "A confirmed order uses two-step outgoing delivery and Delivered quantities. All units are available and nothing has been invoiced. What warehouse operations precede the regular invoice?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Validate the picking operation from stock to output with the actual full quantity.",
+        "Then validate the delivery from output to the customer with the actual shipped quantity.",
+        "Create the regular invoice after the customer delivery is validated."
+      ],
+      "forbidden_claims": [
+        "Validating only the internal pick completes customer delivery.",
+        "Sales-order confirmation alone makes all quantities invoiceable."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Two operations",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_two_steps.rst",
+              "section": "Process delivery order in two steps (pick + ship)",
+              "line_start": 151,
+              "line_end": 153,
+              "sha256": "cfc3fe661a5ef8037a36a103d34fe3dc8c2903b94749140fcfef2e67db0303e3"
+            }
+          ]
+        },
+        {
+          "fact": "Pick",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_two_steps.rst",
+              "section": "Process picking",
+              "line_start": 184,
+              "line_end": 204,
+              "sha256": "cfc3fe661a5ef8037a36a103d34fe3dc8c2903b94749140fcfef2e67db0303e3"
+            }
+          ]
+        },
+        {
+          "fact": "Customer delivery",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/daily_operations/receipts_delivery_two_steps.rst",
+              "section": "Process delivery",
+              "line_start": 209,
+              "line_end": 226,
+              "sha256": "cfc3fe661a5ef8037a36a103d34fe3dc8c2903b94749140fcfef2e67db0303e3"
+            }
+          ]
+        },
+        {
+          "fact": "Invoice prerequisite",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Invoice delivered quantity workflow",
+              "line_start": 109,
+              "line_end": 122,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-022",
+      "type": "workflow",
+      "question": "The delivery operation uses Manual reservation. My confirmed order is waiting, with enough unreserved stock available. How do I reserve the goods and complete delivery?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Manual reservation does not reserve merely on order confirmation.",
+        "Open the delivery and use Check Availability to reserve available stock.",
+        "Check the quantity actually shipping, then Validate when ready."
+      ],
+      "forbidden_claims": [
+        "Waiting always means the warehouse has no stock.",
+        "Manual reservation automatically reserves at confirmation."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Manual behavior",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/reservation_methods/manually.rst",
+              "section": "Introduction",
+              "line_start": 9,
+              "line_end": 13,
+              "sha256": "f44f0dc3c2a8027c36847a0ed257f5f9f8b53b5067fd1e5329456dcead0ed682"
+            }
+          ]
+        },
+        {
+          "fact": "Reserve and deliver",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/reservation_methods/manually.rst",
+              "section": "Workflow",
+              "line_start": 87,
+              "line_end": 108,
+              "sha256": "f44f0dc3c2a8027c36847a0ed257f5f9f8b53b5067fd1e5329456dcead0ed682"
+            }
+          ]
+        }
+      ],
+      "query_family": "reservation_diagnosis",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-023",
+      "type": "workflow",
+      "question": "Quotation templates are enabled. I want a template that requires both an online signature and online payment before order confirmation. What settings and customer actions are documented?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "answer",
+      "expected_answer_points": [
+        "Enable/select both Online Signature and Online Payment for the template; the relevant global features must be available.",
+        "Both conditions must be satisfied if both are selected.",
+        "The customer signs through the portal and completes payment using a configured and published provider.",
+        "Treat order confirmation separately from automatic invoice creation."
+      ],
+      "forbidden_claims": [
+        "Either signature or payment alone suffices when both are required.",
+        "Any payment provider appears without being configured and published.",
+        "This guarantees an automatically posted invoice."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Both conditions and feature availability",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/sales_quotations/quote_template.rst",
+              "section": "Create quotation templates",
+              "line_start": 89,
+              "line_end": 102,
+              "sha256": "e24d9dfa5866efa30c2b8959ed58ef6c4de03f692e82f62ae7d306748c451eb7"
+            }
+          ]
+        },
+        {
+          "fact": "Signature actions",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/sales_quotations/get_signature_to_validate.rst",
+              "section": "Order confirmations with online signatures",
+              "line_start": 53,
+              "line_end": 66,
+              "sha256": "a6e9817d565ea6ab08e85f338f5fc7148b0e87a14d772db854ab809732030241"
+            }
+          ]
+        },
+        {
+          "fact": "Payment provider and payment",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/sales_quotations/get_paid_to_validate.rst",
+              "section": "Register a payment",
+              "line_start": 76,
+              "line_end": 82,
+              "sha256": "f3e0dc367191c66b43183581b6e1fd57ebe27b5093147a5e279ee8a02a090c92"
+            }
+          ]
+        }
+      ],
+      "query_family": "online_order_confirmation",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-024",
+      "type": "ambiguous",
+      "question": "I confirmed a sales order, but the stock is not reserved. What is wrong?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "clarify",
+      "expected_answer_points": [
+        "Ask which reservation method is configured on the operation type, whether enough stock is available, and the scheduled/reservation dates if date-based.",
+        "Manual, at-confirmation and before-scheduled-date methods have different expected timing.",
+        "Do not diagnose a defect from confirmation alone."
+      ],
+      "forbidden_claims": [
+        "A custom module is definitely required.",
+        "Stock is always reserved immediately on confirmation.",
+        "Missing reservation proves there is no stock."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Reservation choices",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/reservation_methods.rst",
+              "section": "Reservation methods",
+              "line_start": 18,
+              "line_end": 33,
+              "sha256": "21b2ce74df9bb26c78108b2ba25044edb2da5150aec56016990495e810edd8c6"
+            }
+          ]
+        },
+        {
+          "fact": "Stock condition",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/reservation_methods/at_confirmation.rst",
+              "section": "Introduction",
+              "line_start": 9,
+              "line_end": 10,
+              "sha256": "c6fe2dce16b4a90124505329aeaf916fbf27a8db2d386492ffe5e1a81bd5857e"
+            }
+          ]
+        },
+        {
+          "fact": "Date-based timing",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/shipping_receiving/reservation_methods/before_scheduled_date.rst",
+              "section": "Workflow",
+              "line_start": 94,
+              "line_end": 103,
+              "sha256": "c3945c7706612768092f89078317f204a65975fc7625c8b10c989b28a9b72d6e"
+            }
+          ]
+        }
+      ],
+      "query_family": "reservation_diagnosis",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-025",
+      "type": "ambiguous",
+      "question": "How do I configure boxes of six?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "clarify",
+      "expected_answer_points": [
+        "Ask whether six refers to a product-specific selling/handling quantity or physical shipping containers holding items.",
+        "Then choose packaging or package guidance based on that meaning."
+      ],
+      "forbidden_claims": [
+        "Assume the user means physical package types.",
+        "Assume the user means a product six-pack."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Physical container",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/product_management/configure/package.rst",
+              "section": "Introduction",
+              "line_start": 7,
+              "line_end": 16,
+              "sha256": "a1e3153f3543e352fe4983eb06685a571b0dbc45eef7b0ed2ca31c1e8af3e979"
+            }
+          ]
+        },
+        {
+          "fact": "Product-specific quantity",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/product_management/configure/packaging.rst",
+              "section": "Introduction",
+              "line_start": 7,
+              "line_end": 12,
+              "sha256": "79253e00ee854ab3f5ee0e71a2ea3d3d795143b8671c2e2554ceb36f2ab13f70"
+            }
+          ]
+        }
+      ],
+      "query_family": "package_meaning",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-026",
+      "type": "ambiguous",
+      "question": "I cannot create an invoice for this order. What should I change?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "clarify",
+      "expected_answer_points": [
+        "Ask whether the order is confirmed, whether the user wants a regular invoice or a down payment, the product invoicing policy, and the delivery/validation state.",
+        "Explain policy-dependent prerequisites conditionally; ask for the exact error when needed."
+      ],
+      "forbidden_claims": [
+        "Immediately switch the policy without diagnosing the workflow.",
+        "Assume a software defect or a need for customization.",
+        "All invoice types have identical delivery prerequisites."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Ordered policy",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Invoicing what is ordered",
+              "line_start": 58,
+              "line_end": 61,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        },
+        {
+          "fact": "Delivered policy and warning",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/invoicing_policy.rst",
+              "section": "Invoice delivered quantity workflow",
+              "line_start": 109,
+              "line_end": 122,
+              "sha256": "7e6b9e0af7748b8310d1d5558a9eabe066dd321564426ac55d60ea8220816ee3"
+            }
+          ]
+        },
+        {
+          "fact": "Invoice choices",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/sales/sales/invoicing/down_payment.rst",
+              "section": "Create invoices",
+              "line_start": 28,
+              "line_end": 42,
+              "sha256": "221838da98cb31fa76393ee94a2fd73ccf281052a83008988a748559a11a2571"
+            }
+          ]
+        }
+      ],
+      "query_family": "invoice_eligibility",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-027",
+      "type": "unanswerable",
+      "question": "Can our warehouse fulfill 50 units of SKU CAB-001 today? Tell me the actual quantity available.",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "insufficient_evidence",
+      "expected_answer_points": [
+        "State that the documentation snapshot has no access to the real warehouse/product quantities or reservations.",
+        "Request current warehouse/product availability and relevant dates, or explain where a tracked-product forecast can be inspected."
+      ],
+      "forbidden_claims": [
+        "Invent current stock, reservations or a fulfillment promise."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Optional navigation help",
+          "required": false,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/inventory_and_mrp/inventory/warehouses_storage/reporting/forecast.rst",
+              "section": "Introduction and Navigating the report",
+              "line_start": 17,
+              "line_end": 30,
+              "sha256": "e80690a60d86be659d6b5a0b3cf86ba1263d219b2670c74419cf3528f8d5f307"
+            }
+          ]
+        }
+      ],
+      "query_family": "live_database_boundary",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "The invented SKU identifies a hypothetical live-data request; no actual user database was queried.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-028",
+      "type": "unanswerable",
+      "question": "Exactly what changed in the partial-delivery invoicing workflow between Odoo 18 and Odoo 19?",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "insufficient_evidence",
+      "expected_answer_points": [
+        "The reviewed corpus is a single Odoo 19 snapshot; it cannot establish a version-to-version change list.",
+        "Request or review an appropriate Odoo 18 source snapshot and compare before answering the change question."
+      ],
+      "forbidden_claims": [
+        "Invent changes from Odoo 19 behavior alone.",
+        "Treat a single-version page as evidence of a change."
+      ],
+      "evidence_groups": [],
+      "query_family": "version_comparison_boundary",
+      "split": "holdout",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "Boundary case is justified by corpus metadata. It has no positive answer passage to retrieve.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-029",
+      "type": "unanswerable",
+      "question": "Will our private custom delivery module work unchanged after upgrading to Odoo 19? Please guarantee compatibility.",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "insufficient_evidence",
+      "expected_answer_points": [
+        "The documentation-only corpus cannot establish compatibility of unseen custom code or a particular deployment.",
+        "Request the module, dependencies, relevant versions and test results for a separate review."
+      ],
+      "forbidden_claims": [
+        "Guarantee compatibility.",
+        "Claim the module definitely requires rewriting because retrieval found nothing."
+      ],
+      "evidence_groups": [],
+      "query_family": "custom_code_boundary",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "No custom module source or runtime test evidence is included in this corpus.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    },
+    {
+      "id": "M12-DRAFT-030",
+      "type": "unanswerable",
+      "question": "From the two journal-entry screenshots in Credit notes and refunds, list the exact account names and debit/credit amounts shown.",
+      "odoo_version": "19.0",
+      "language": "en",
+      "source_commit": "c9202e68ae702daec981b47d0b6055191084ffa2",
+      "expected_behavior": "insufficient_evidence",
+      "expected_answer_points": [
+        "The reviewed text references screenshots but the image bytes were not supplied.",
+        "Explain that the exact accounts and amounts cannot be extracted from the alt text; request the images or a text transcription."
+      ],
+      "forbidden_claims": [
+        "Invent the ledger accounts or numeric amounts.",
+        "Present the generic reversal description as the exact image contents."
+      ],
+      "evidence_groups": [
+        {
+          "fact": "Image-only details",
+          "required": true,
+          "target_match": "all",
+          "targets": [
+            {
+              "source_path": "content/applications/finance/accounting/customer_invoices/credit_notes.rst",
+              "section": "Journal entries example",
+              "line_start": 109,
+              "line_end": 118,
+              "sha256": "49ed30d1777701d4fc4a48a6a48839df7c18a4641a01f0d8735cf6e85a093d41"
+            }
+          ]
+        }
+      ],
+      "query_family": "returns_refunds",
+      "split": "development",
+      "review_status": "accepted_by_user",
+      "human_reviewer": "Aarib (user)",
+      "reviewed_at": "2026-10-22",
+      "review_note": "Keep this case valid only while the evaluation input remains text-only and the screenshot contents are unavailable.",
+      "review_basis": "User reported reviewing the supplied documents and accepted the package as presented; acceptance recorded at package level."
+    }
+  ],
+  "accepted_on": "2026-10-22",
+  "frozen_on": "2026-10-22",
+  "approval_record": "docs/acceptance.json",
+  "approved_config_sha256": "bcd25e8ec7633f1c51ab3a908de1989a8f2e05de535885eb0e66a1e8b799d2a3",
+  "case_id_policy": "Existing M12-DRAFT-* IDs are retained as stable identifiers. Review status and benchmark_version determine approval; the historical ID prefix does not."
+}
