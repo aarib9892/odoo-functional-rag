@@ -2,7 +2,9 @@
 name = "odoo-functional-rag-backend"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "tiktoken==0.14.0",
+]
 
 [dependency-groups]
 parser-spike = [
