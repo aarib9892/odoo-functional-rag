@@ -54,3 +54,43 @@ def merge_drafts(
         evidence_text=evidence,
         retrieval_text=retrieval,
     )
+
+
+def attach_images(
+    drafts: list[ChunkDraft],
+    block_kinds: dict[str, str],
+    document_title: str,
+) -> list[ChunkDraft]:
+    """Attach standalone images within one unmerged section group."""
+    if not drafts:
+        return []
+
+    first = drafts[0]
+    attached: list[ChunkDraft] = []
+    seen: set[str] = set()
+
+    for draft in drafts:
+        if section_key(draft) != section_key(first) or draft.source != first.source:
+            raise ValueError("Images must stay within their source and section")
+
+        if len(draft.source_block_ids) != 1:
+            raise ValueError("Attach images before merging other drafts")
+
+        block_id = draft.source_block_ids[0]
+
+        if block_id in seen:
+            raise ValueError("Duplicate source block IDs")
+        seen.add(block_id)
+
+        if block_kinds[block_id] != "image":
+            attached.append(draft)
+        else:
+            if not attached:
+                raise ValueError(f"Image {block_id} has no preceding content")
+
+            attached[-1] = merge_drafts(
+                [attached[-1], draft],
+                document_title,
+            )
+
+    return attached
