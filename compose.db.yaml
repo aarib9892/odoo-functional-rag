@@ -1,0 +1,22 @@
+name: odoo-functional-rag
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg16-bookworm
+    environment:
+      POSTGRES_DB: odoo_rag
+      POSTGRES_USER: odoo_rag
+      POSTGRES_PASSWORD: ${ODOO_RAG_DB_PASSWORD:?Set ODOO_RAG_DB_PASSWORD in backend/.env}
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres_data:
