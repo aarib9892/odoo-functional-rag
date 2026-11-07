@@ -16,6 +16,7 @@ def prepare_candidate(
     chunk_output: Path,
     *,
     max_tokens: int = 512,
+    include_policy=None,
 ) -> tuple[Path, Path]:
     """Build complete normalized/chunk snapshots without activating an index."""
     repository = repository.resolve()
@@ -38,8 +39,16 @@ def prepare_candidate(
     if get_clean_commit(repository) != expected_commit:
         raise ValueError("Source checkout differs from the manifest commit")
 
-    documents, _, payload = build_corpus(repository, manifest)
+    build_options = {}
 
+    if include_policy is not None:
+        build_options["include_policy"] = include_policy
+
+    documents, _, payload = build_corpus(
+        repository,
+        manifest,
+        **build_options,
+    )
     records = manifest["inventory"]["files"]
     expected_paths = {record["source_path"] for record in records}
 
