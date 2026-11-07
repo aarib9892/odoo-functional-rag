@@ -1,0 +1,20 @@
+# Candidate user unit. Review host/path/origin and proxy before installation.
+[Unit]
+Description=Odoo Fieldguide restricted pilot
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/odoo-functional-rag/backend
+ExecStart=%h/odoo-functional-rag/backend/.venv/bin/python -m app.pilot
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=70
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=%h/odoo-functional-rag/data
+
+[Install]
+WantedBy=default.target

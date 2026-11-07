@@ -4,11 +4,15 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "asyncpg==0.32.0",
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.34,<1",
+    "python-dotenv>=1.0,<2",
     "openai==3.40.0",
     "tiktoken==0.14.0",
 ]
 
 [dependency-groups]
+pilot-test = ["httpx>=0.28,<1"]
 parser-spike = [
     "docutils==0.21.2",
     "sphinx==8.2.3",

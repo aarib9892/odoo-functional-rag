@@ -8,3 +8,8 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
