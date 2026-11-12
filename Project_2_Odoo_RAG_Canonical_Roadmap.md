@@ -1,10 +1,10 @@
 # Project 2 — Odoo Functional RAG & Implementation Assistant
 
-Canonical roadmap v1.53\
+Canonical roadmap v1.54\
 Established: 18 October 2026\
 Updated: 7 November 2026\
 Status: M1/M2 and accepted embedding/dense artifacts verified in the actual repository; bounded M6/M9/M10 internal pilot implemented with 72 backend tests, two browser tests and a real browser/provider smoke. Hard-workflow answer quality and operations/client acceptance remain incomplete; M3 research gates remain open.\
-Next task: Keep the confirmed Odoo 19-only scope, review hard-workflow false abstentions/clarifications, collect the operations task observations, and review a concrete hosting target before external publication.
+Next task: Review the full-application offline estimate and choose a provider cap; then build/evaluate the isolated candidate and complete human workflow review before switching the pilot. Odoo 19 remains the only version; client exposure is still pending.
 
 
 ## Pilot delivery priority — 6 November 2026
@@ -20,6 +20,14 @@ The current frozen K=5 baseline has 13/15 answerable-case hits and complete evid
 The latest user result also verifies `load_evidence_sources()` with real temporary Git fixtures: three source files for one page/two dependencies, preserved lines/counts, deterministic replay, old-pin stability after checkout/later commits, matching hashes required for a new pin, invalid-metadata rejection, single-file support and unchanged input metadata. Cross-file alignment/scoring and full include-aware rebuild integration remain unfinished in the user repository.
 
 An alignment v0.2/physical-span draft was started only in the assistant's verification copy after that result; it was never delivered to Aarib. Upon the plan change it was archived separately and the verification copy restored to the last shared `m3-paragraph-evidence-0.1` implementation. Codex must inspect the actual repository rather than assuming any unshared draft is present. No new production index, provider job, deployment or client message occurred during this handoff.
+
+### Full-application implementation / v1.54 — 7 November 2026
+
+Aarib approved the plan to expand to all 944 English application pages at the current source pin, with text and image references, an isolated candidate, and a reviewed switch. The budget choice was explicitly deferred until an offline estimate is available. This supersedes the narrow page-selection priority for the next corpus, while preserving the 30-page pilot and its frozen baseline.
+
+Offline normalization and chunking now account for all 944 pages without fatal parser or unsupported-structure errors: 879 searchable, 65 reference-only, 11,926 chunks and 11,134 unique eligible inputs. Of these, 179 vectors already exist in cache and 10,955 require embeddings (1,341,670 tokens). Measured reference edges: 7,319; image references: 3,255. Estimated embeddings $0.026833; an 83-case generation/review run is approximately $0.3652 plus question embeddings under documented assumptions. No new provider requests or expanded index publication occurred.
+
+Opt-in broader parser/renderer support, immutable preparation, PostgreSQL FTS/RRF search, generic cross-document context, release descriptors/session migration, dynamic UI scope, shared spending reservations, candidate publication/evaluation and human approval commands are implemented. The additive SQL migration and real hybrid query passed on the existing database with cached embeddings and provider requests forbidden. New development cases and reference excerpts remain provisional; full-corpus retrieval/answer results and human acceptance are pending. See [implementation, artifacts and gates](docs/FULL_CORPUS.md). M4/M5 now have bounded implementation work; their evaluation/completion gates remain open. No other milestone is marked complete.
 
 ### Confirmed version scope / v1.53 changelog — 7 November 2026
 
@@ -52,8 +60,8 @@ Project 1 is complete according to the supplied brief. Reuse its understood runt
 | M1 | Corpus scope, provenance, and evaluation contract | Reproducible inventory and human-reviewed benchmark | Complete |
 | M2 | Structure-preserving RST ingestion | Normalized documents with source provenance | Complete for the accepted corpus and reviewed fixtures |
 | M3 | Chunking, incremental indexing, and dense baseline | Measurable retriever and repeatable index lifecycle | In progress — native baseline/non-include lifecycle verified; include handling, reporting, chunking comparison and M3.1 combined tests pending |
-| M4 | Hybrid retrieval and retrieval debugging | Dense/lexical/hybrid comparison and inspection interface | Not started |
-| M5 | Reranking and evidence assembly | Evaluated ranking stage and bounded evidence packets | Not started |
+| M4 | Hybrid retrieval and retrieval debugging | Dense/lexical/hybrid comparison and inspection interface | In progress — hybrid SQL implemented/tested; full-corpus comparison pending budget |
+| M5 | Reranking and evidence assembly | Evaluated ranking stage and bounded evidence packets | In progress — generic bounded reference/neighbor assembly implemented; semantic acceptance pending |
 | M6 | Grounded functional Q&A and citations | Persistent assistant with verifiable source references | In progress — bounded local pilot implemented/tested; generated-answer/task acceptance incomplete |
 | M7 | Configuration guidance and requirement analysis | Bounded, evidence-backed consulting workflows | Not started |
 | M8 | Version-aware retrieval and comparison | Isolated Odoo 17/18/19 evidence and qualified comparisons | Deferred — outside the confirmed current Odoo 19-only scope |
@@ -1089,6 +1097,8 @@ This is an engineering plan with recorded M1 implementation/acceptance and M2 no
 Sources consulted on 18 October 2026. Some direct GitHub and English Odoo page fetches were unavailable; no repository-wide inspection is claimed.
 
 ## Changelog
+
+- 2026-11-07 — v1.54: Implemented offline preparation for all 944 application pages and candidate/runtime infrastructure. Recorded verified artifacts, provisional development cases and provider cost estimate; new billable batches await a cap, and activation awaits human review. Preserved the original pilot and frozen evaluations.
 
 - 2026-11-07 — v1.53: Recorded Aarib’s confirmation that Odoo 19 is the only covered version for now. Removed version choice from open pilot decisions, constrained corpus expansion/evaluation to version 19, and explicitly deferred M8 without changing milestone IDs. Hosting, cohort and task-quality acceptance remain pending.
 - 2026-11-06 — v1.51: Aarib explicitly changed priority to rapid Codex-led implementation for CEO/operations/client validation. Added a bounded pilot delivery track drawing forward grounded Q&A, essential access/observability and launch preparation while retaining milestone IDs, unfinished gates, baseline/holdout integrity and broader-release requirements. Recorded native evidence-source loader success and the fact that the unshared alignment draft was not applied to the user repository. Prepared CODEX_HANDOFF.md; pilot versions/hosting remain to be confirmed.

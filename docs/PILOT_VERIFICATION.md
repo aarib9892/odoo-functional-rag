@@ -4,6 +4,10 @@ The browser-to-answer pilot is implemented and runnable locally. **Ready for int
 
 UI update, 7 November 2026: removed the version selector following the confirmed Odoo 19-only scope. Questions automatically use 19.0 and the composer shows a fixed Odoo 19 label. `npm run build` and both updated browser tests pass; the first question no longer requires version selection. The running local server was checked to serve the updated assets. This UI check used synthetic retrieval/generation and made no live provider calls.
 
+## Full-application preparation — 7 November 2026
+
+The separate 944-page candidate now passes offline normalization/chunking: 879 searchable pages, 65 reference-only, 11,926 chunks and 179 reusable cached embeddings. No new provider batches or expanded publication have run. The full backend regression passed 87 tests; the final expanded module passed all 16 tests after adding its approval-gate check (88 backend cases total). Three browser tests and the UI build pass. The original pilot was backed up and restarted on the same 30-page/205-chunk release; authenticated readiness and release metadata checks passed. See [full-corpus artifacts, estimate and gates](FULL_CORPUS.md). Budget selection and human release review remain pending.
+
 ## Repository and baseline
 
 - Isolated branch: `pilot/grounded-browser`, based on `0095126`. Preexisting changes were backed up to `/tmp/odoo-pilot-preexisting.tar.gz` and `.patch`. Checksums confirm the four modified ingestion/indexing files plus the existing untracked source loader/include reader remain byte-identical. Handoff/roadmap additions are deliberate documentation updates. No user changes were committed or discarded.

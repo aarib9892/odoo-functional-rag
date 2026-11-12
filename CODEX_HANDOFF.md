@@ -4,6 +4,16 @@ Date: 6 November 2026 (Asia/Calcutta)
 Owner: Aarib Meterwala
 Delivery mode: Codex-led implementation; Aarib reviews working features, scope and answer quality.
 
+## Full-application expansion checkpoint — 7 November 2026
+
+Aarib approved implementing the full-application plan: all 944 English Odoo 19 application pages at the current pin, text/captions/image references only, separate candidate and reviewed switch. He explicitly chose **estimate before selecting a provider budget**. No new provider batch is authorized until he chooses a cap. See [FULL_CORPUS.md](docs/FULL_CORPUS.md) for measured artifacts, cost assumptions, commands and gates.
+
+Offline audit/preparation completed: 944 normalized pages, zero fatal parser/unsupported-node errors, 879 searchable pages, 65 reference-only pages, 11,926 chunks, 11,134 eligible unique inputs, 179 cached vectors, 10,955 missing embeddings (1,341,670 tokens), 7,319 reference links and 3,255 image references. Estimated new embeddings $0.026833; planned 83-case answer evaluation about $0.3652 plus query embeddings, approximately $0.41 total under recorded assumptions. No new embeddings or live generation were executed. The original index and frozen benchmark remain intact.
+
+Implemented opt-in full parsing/chunking, generic reference/neighbor packets, PostgreSQL FTS/RRF retrieval, release descriptors, release-bound sessions, dynamic UI coverage, isolated preview settings, shared budget reservations, candidate publication/evaluation and human-review approval commands. The additive SQL migration and hybrid SQL path were verified on the existing project DB using a cached query with provider calls forbidden. Sixty new development cases have provisional source excerpts; expected answer points/gold groups still require human review. No full candidate index or generated-answer comparison exists yet; these depend on the budget choice.
+
+**Next:** obtain the user's cap choice from the concrete offline estimate, then run metered candidate publication and evaluation. Do not reset the ledger or switch the pilot automatically. Human review of the six workflow families is required before activation. The original 30-page pilot remains the fallback.
+
 ## Confirmed version scope — 7 November 2026
 
 Aarib confirmed that **only Odoo 19 is covered for now**. This is the agreed product scope, superseding the earlier implementation assumption. Keep documentation expansion, evaluation and pilot answers within Odoo 19; cross-version ingestion/comparison is deferred. Hosting and the pilot cohort still need selection.
@@ -27,7 +37,7 @@ The bounded internal pilot is now implemented on branch `pilot/grounded-browser`
 
 Turn the existing `odoo-functional-rag` repository into a small, usable documentation-grounded assistant for an internal operations pilot, followed by a limited pilot with the CEO's existing clients. Learn whether it helps users complete real Odoo tasks correctly and faster.
 
-Implement in the actual repository. The known local root is `/home/aarib/odoo-functional-rag`; Python commands run from `backend`. A Git remote URL has not been supplied in this handoff. Read repository instructions and inspect the code and working tree before making assumptions. Preserve uncommitted user work. The accompanying `Project_2_Odoo_RAG_Canonical_Roadmap.md` v1.53 records the changed delivery priority and detailed history.
+Implement in the actual repository. The known local root is `/home/aarib/odoo-functional-rag`; Python commands run from `backend`. A Git remote URL has not been supplied in this handoff. Read repository instructions and inspect the code and working tree before making assumptions. Preserve uncommitted user work. The accompanying `Project_2_Odoo_RAG_Canonical_Roadmap.md` v1.54 records the changed delivery priority and detailed history.
 
 Work through implementation, tests and a runnable demonstration rather than stopping after an audit or plan. Give concise progress updates and explain completed features at module level; line-by-line teaching is no longer the default. Resolve routine implementation choices autonomously. Ask for missing product decisions only when they materially affect the outcome.
 

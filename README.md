@@ -4,6 +4,8 @@ A restricted browser assistant for the selected **Odoo 19 English Sales and Inve
 
 The pilot reuses the existing query embedding cache and exact pgvector K=5 retriever. It adds bounded support passages for two observed workflow gaps, structured answers, server-validated citation IDs and verbatim quotes, a separate model support/completeness review, session isolation and task feedback. A model review does not establish factual correctness; internal operations review is still required.
 
+**Full-application expansion is prepared separately:** all 944 pages have passed offline normalization and chunk preparation, producing 11,926 chunks. The current 30-page release remains active. New embeddings and live candidate evaluation await a user-chosen spending cap; candidate activation also requires human review. See [full-corpus preparation, estimate and release steps](docs/FULL_CORPUS.md).
+
 ## Run locally
 
 Requirements: Python 3.12+, uv, Node 18.19+ (Node 22 recommended for a new machine), npm, and the existing project PostgreSQL/pgvector database. Existing provider/database secrets remain in `backend/.env`.
