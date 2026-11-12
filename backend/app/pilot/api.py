@@ -58,10 +58,12 @@ class BodyLimit:
 async def check_readiness(settings):
     async with connect_database() as db:
         row = await db.fetchrow("""SELECT s.snapshot_id, s.expected_chunks,
+            (s.metadata #>> '{chunk_summary,normalized_documents}')::int AS documents,
             (SELECT count(*) FROM index_chunks c WHERE c.snapshot_id=s.snapshot_id) AS actual
             FROM active_indexes a JOIN index_snapshots s USING(snapshot_id)
-            WHERE a.corpus_name='odoo19' AND s.published""")
-    if not row or row["snapshot_id"] != settings.snapshot_id or row["actual"] != row["expected_chunks"]:
+            WHERE a.corpus_name=$1 AND s.published""", settings.corpus_name)
+    if (not row or row["snapshot_id"] != settings.snapshot_id or row["actual"] != row["expected_chunks"]
+            or row['documents'] != settings.document_count):
         raise ValueError("Reviewed pilot index unavailable")
     return {"snapshot_id": row["snapshot_id"], "chunks": row["actual"]}
 
@@ -74,9 +76,17 @@ def create_app(settings=None, service=None, readiness=None):
 
     @asynccontextmanager
     async def lifespan(app):
+        metering = None
+        if settings.full_applications and os.environ.get("OPENAI_API_KEY"):
+            from app.expansion.budget import Budget, MeteredClient
+            from app.pilot.settings import ROOT
+            metering = (Budget(os.environ.get('PILOT_BUDGET_FILE', str(ROOT/'data/expansion/budget.sqlite3'))),
+                        json.loads((ROOT/'config/expansion.pricing.json').read_text()))
         client = AsyncOpenAI(timeout=45, max_retries=0) if os.environ.get("OPENAI_API_KEY") else None
+        if metering:
+            client = MeteredClient(client, *metering)
         app.state.client = client
-        app.state.service = service or AnswerService(settings, Generator(settings.model, client, settings.reasoning_effort))
+        app.state.service = service or AnswerService(settings, Generator(settings.model, client, settings.reasoning_effort, full_applications=settings.full_applications))
         try:
             yield
         finally:
@@ -102,7 +112,7 @@ def create_app(settings=None, service=None, readiness=None):
         return response
 
     async def session(request: Request):
-        found = store.session(request.cookies.get(COOKIE), settings)
+        found = store.session(request.cookies.get(settings.cookie_name), settings)
         if not found:
             raise HTTPException(401, "Sign in with your pilot access key")
         return found
@@ -124,19 +134,19 @@ def create_app(settings=None, service=None, readiness=None):
         token = store.login(body.access_key, settings)
         if token is None:
             raise HTTPException(401, "Invalid pilot access key")
-        response.set_cookie(COOKIE, token, max_age=settings.session_hours * 3600,
+        response.set_cookie(settings.cookie_name, token, max_age=settings.session_hours * 3600,
                             httponly=True, secure=settings.secure_cookie, samesite="strict", path="/api")
         return {"status": "signed_in"}
 
     @app.post("/api/logout")
     async def logout(request: Request, response: Response, current=Depends(session)):
-        store.logout(request.cookies[COOKIE])
-        response.delete_cookie(COOKIE, path="/api", secure=settings.secure_cookie, httponly=True, samesite="strict")
+        store.logout(request.cookies[settings.cookie_name])
+        response.delete_cookie(settings.cookie_name, path="/api", secure=settings.secure_cookie, httponly=True, samesite="strict")
         return {"status": "signed_out"}
 
     @app.get("/api/session")
     async def current_session(current=Depends(session)):
-        return {"name": current["principal"], "supported_version": "19.0", "topics": ["Sales", "Inventory"],
+        return {"name": current["principal"], "supported_version": "19.0", "topics": list(settings.topics), "coverage": settings.coverage(),
                 "history": store.history(current["id"])}
 
     @app.get("/api/ready")
@@ -160,9 +170,9 @@ def create_app(settings=None, service=None, readiness=None):
         request_id = str(uuid4())
         response.headers["X-Request-ID"] = request_id
         history = store.history(current["id"])
-        store.start(request_id, current["id"], current["principal"], body.question, body.odoo_version)
+        store.start(request_id, current["id"], current["principal"], body.question, body.odoo_version, release_id=settings.release_id)
         started = perf_counter()
-        telemetry = {"generation_model": settings.model}
+        telemetry = {"generation_model": settings.model, "release_id": settings.release_id, "retrieval_method": settings.retrieval_method}
         try:
             async with slots, asyncio.timeout(settings.request_timeout):
                 if not injected_service and app.state.client is None:

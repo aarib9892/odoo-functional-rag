@@ -28,6 +28,24 @@ class Settings:
     answers_per_day: int = 100
     total_answers_per_day: int = 500
     max_concurrent: int = 2
+    corpus_name: str = "odoo19"
+    release_id: str = "pilot-30"
+    full_applications: bool = False
+    retrieval_method: str = "dense"
+    document_count: int = 30
+    topics: tuple[str, ...] = ("Sales", "Inventory")
+    reviewed_workflows: tuple[str, ...] = ()
+    cookie_name: str = "odoo_pilot_session"
+    searchable_documents: int = 30
+    reference_only_documents: int = 0
+    release_state: str = "pilot"
+
+    def coverage(self):
+        return {"release_id": self.release_id, "documents": self.document_count,
+                "topics": list(self.topics), "reviewed_workflows": list(self.reviewed_workflows),
+                "searchable_documents": self.searchable_documents,
+                "reference_only_documents": self.reference_only_documents, "state": self.release_state,
+                "image_interpretation": False}
 
     def __post_init__(self):
         secrets = [*self.access_keys.values(), self.admin_key]
@@ -59,6 +77,26 @@ class Settings:
     @classmethod
     def from_env(cls):
         model = os.environ.get("PILOT_GENERATION_MODEL") or os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
+        release_options = {}
+        release_file = os.environ.get("PILOT_RELEASE_FILE")
+        if release_file:
+            from app.pilot.release import load_release
+            r = load_release(Path(release_file))
+            preview = os.environ.get('PILOT_CANDIDATE_PREVIEW') == 'true'
+            if r['state'] != 'approved' and not preview:
+                raise ValueError('Candidate requires isolated preview or reviewed approval')
+            if preview and os.environ.get('PILOT_PUBLIC_ORIGIN') != 'http://localhost:8010':
+                raise ValueError('Candidate preview requires localhost:8010')
+            release_options = dict(snapshot_id=r['snapshot_id'], source_commit=r['source']['commit'],
+                corpus_name=r['corpus_name'], release_id=r['release_id'], full_applications=True,
+                document_count=r['coverage']['documents'], topics=tuple(r['coverage']['topics']),
+                reviewed_workflows=tuple(r['coverage'].get('reviewed_workflows', [])),
+                retrieval_method=r['retrieval_method'],
+                searchable_documents=r['coverage']['searchable_documents'],
+                reference_only_documents=r['coverage']['reference_only_documents'], release_state=r['state'],
+                cookie_name='odoo_candidate_session' if preview else 'odoo_pilot_session')
+            if preview:
+                release_options['store_path'] = ROOT / 'data/expansion/preview.sqlite3'
         return cls(
             access_keys=json.loads(os.environ.get("PILOT_ACCESS_KEYS", "{}")),
             admin_key=os.environ.get("PILOT_ADMIN_KEY", ""),
@@ -66,8 +104,9 @@ class Settings:
             reasoning_effort=os.environ.get("PILOT_REASONING_EFFORT") or ("low" if model == "gpt-6-luna" else None),
             public_origin=os.environ.get("PILOT_PUBLIC_ORIGIN", "http://localhost:8000"),
             secure_cookie=os.environ.get("PILOT_SECURE_COOKIE", "false").lower() == "true",
-            store_path=Path(os.environ.get("PILOT_STORE_PATH", str(ROOT / "data/pilot/pilot.sqlite3"))),
+            store_path=release_options.pop('store_path', Path(os.environ.get("PILOT_STORE_PATH", str(ROOT / "data/pilot/pilot.sqlite3")))),
             request_timeout=float(os.environ.get("PILOT_REQUEST_TIMEOUT", "60")),
             answers_per_day=int(os.environ.get("PILOT_ANSWERS_PER_DAY", "100")),
             total_answers_per_day=int(os.environ.get("PILOT_TOTAL_ANSWERS_PER_DAY", "500")),
+            **release_options,
         )

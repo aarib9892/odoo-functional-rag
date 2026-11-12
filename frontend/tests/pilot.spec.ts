@@ -53,3 +53,23 @@ test('mobile layout and recoverable provider errors', async ({ page }) => {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/mobile-pilot.png', fullPage: true });
 });
+
+test('coverage and examples come from the active release metadata', async ({ page }) => {
+  await page.route('**/api/session', async route => {
+    const response = await route.fetch();
+    if (!response.ok()) return route.fulfill({ response });
+    const body = await response.json();
+    await route.fulfill({ response, json: { ...body, coverage: {
+      release_id: 'synthetic-full-release', documents: 944,
+      topics: ['POS', 'Website', 'Accounting', 'Inventory'], reviewed_workflows: [],
+    } } });
+  });
+  await page.goto('/');
+  await page.getByLabel('Pilot access key').fill('test-internal-access-key-123456789');
+  await page.getByRole('button', { name: 'Open workspace' }).click();
+  await expect(page.getByText('944 documentation pages', { exact: false })).toBeVisible();
+  await expect(page.getByText('0 workflow families accepted by human review', { exact: false })).toBeVisible();
+  await expect(page.getByRole('combobox')).toHaveCount(0);
+  await page.getByRole('button', { name: 'How do I set up a POS shop with cash payments?' }).click();
+  await expect(page.getByLabel('Your Odoo task', { exact: true })).toHaveValue('How do I set up a POS shop with cash payments?');
+});

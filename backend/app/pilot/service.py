@@ -48,12 +48,19 @@ class AnswerService:
             followup = previous and (previous.get("response") or {}).get("status") == "needs_clarification"
             query = "\n".join([*(h["question"] for h in history[-3:]), "Clarification: " + question]) if followup else question
             retrieval = await self.retriever(
-                query, EmbeddingCache(self.settings.query_cache), "odoo19", 5, client=client)
+                query, EmbeddingCache(self.settings.query_cache), self.settings.corpus_name,
+                20 if self.settings.full_applications else 5, client=client,
+                **({"method": self.settings.retrieval_method, "expected_snapshot_id": self.settings.snapshot_id}
+                   if self.settings.full_applications else {}))
             telemetry["embedding"] = retrieval.get("query_embedding")
-            retrieval = await self.assembler(query, retrieval, self.settings)
+            if self.settings.full_applications:
+                from app.expansion.context import extend
+                retrieval = await extend(query, retrieval, self.settings)
+            else:
+                retrieval = await self.assembler(query, retrieval, self.settings)
             telemetry["context_policy"] = retrieval.get("context_policy")
             telemetry["support_chunk_ids"] = retrieval.get("support_chunk_ids", [])
-            evidence = build_evidence(retrieval, self.settings)
+            evidence = build_evidence(retrieval, self.settings, budget=6000 if self.settings.full_applications else 3500)
             telemetry["evidence_chunk_ids"] = [e["chunk_id"] for e in evidence]
             draft = DraftAnswer(status="insufficient_evidence", claims=[], clarification_question=None)
             validation = "empty_evidence"
@@ -92,7 +99,7 @@ class AnswerService:
             "trace": {**{k: v for k, v in telemetry.items() if not k.startswith("_")},
                 "latency_ms": round((perf_counter() - started) * 1000),
                 "snapshot_id": retrieval["snapshot_id"] if retrieval else None,
-                "retrieval_k": 5, "evidence_count": len(evidence),
+                "retrieval_k": 20 if self.settings.full_applications else 5, "evidence_count": len(evidence),
                 "embedding": retrieval.get("query_embedding") if retrieval else None,
                 "generation": calls, "validation": validation,
             },

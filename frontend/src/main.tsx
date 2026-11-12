@@ -10,7 +10,8 @@ type Answer = { request_id: string; status: 'answered' | 'needs_clarification' |
   trace: { latency_ms: number; snapshot_id: string | null } };
 type Feedback = { outcome: string; comment: string; task_minutes: number | null };
 type Entry = { request_id: string; question: string; response: Answer | null; error: string | null; feedback: Feedback | null };
-type Session = { name: string; history: Entry[] };
+type Coverage = { release_id: string; documents: number; topics: string[]; reviewed_workflows: string[]; searchable_documents?: number; reference_only_documents?: number; state?: string };
+type Session = { name: string; history: Entry[]; coverage?: Coverage };
 
 class ApiError extends Error { constructor(message: string, public status: number) { super(message); } }
 async function api<T>(path: string, body?: unknown): Promise<T> {
@@ -30,6 +31,9 @@ const examples = ['How do ordered and delivered quantity invoicing differ?',
   'How do I deliver part of an order and create a backorder?',
   'How do I return a product after the customer has been invoiced?'];
 const supportedVersion = '19.0';
+const fullExamples = ['How do I set up a POS shop with cash payments?',
+  'How do I configure an online shop with delivery and pickup?',
+  'How do I record a partial payment against an existing invoice?'];
 
 function FeedbackForm({ entry, expired }: { entry: Entry; expired: () => void }) {
   const [outcome, setOutcome] = useState(entry.feedback?.outcome || '');
@@ -87,6 +91,7 @@ function AnswerCard({ entry, expired }: { entry: Entry; expired: () => void }) {
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
+  const [coverage, setCoverage] = useState<Coverage | null>(null);
   const [checking, setChecking] = useState(true);
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
@@ -101,7 +106,7 @@ function App() {
   function expired() { setSession(null); setEntries([]); setKey(''); setError('Your session ended. Sign in again.'); }
   async function loadSession() {
     const current = await api<Session>('/session');
-    if (mounted.current) { setSession(current); setEntries(current.history); }
+    if (mounted.current) { setSession(current); setEntries(current.history); setCoverage(current.coverage || null); }
     try { await api('/ready'); if (mounted.current) setReadiness('Documentation index connected'); }
     catch { if (mounted.current) setReadiness('Dependencies unavailable. Ask the operator to check the pilot.'); }
   }
@@ -140,9 +145,11 @@ function App() {
     </header>
     <main className={session ? 'workspace' : 'welcome'}>
       <aside><div className="eyebrow">A little clarity, grounded in the docs</div><h1>Move your<br /> Odoo task<br /> <em>forward.</em></h1>
-        <p>Practical guidance with the source beside it. Start with a Sales or Inventory question.</p>
-        <div className="scope"><span className="dot" />Odoo 19 · English<span>Sales & Inventory · 30 selected pages</span></div>
-        <div className="scope-note">One Accounting page supports returns and refunds. Coverage is limited to the selected public documentation.</div>
+        <p>Practical guidance with the source beside it. Ask about a workflow covered by this documentation release.</p>
+        <div className="scope"><span className="dot" />Odoo 19 · English<span>{coverage ? `${coverage.topics.join(', ')} · ${coverage.documents} documentation pages` : 'Sign in to view documentation coverage'}</span></div>
+        <div className="scope-note">{coverage && coverage.documents > 30 ? `${coverage.searchable_documents ?? 'Most'} pages contain searchable content; ${coverage.reference_only_documents ?? 'some'} are reference-only. Workflow correctness still requires review; screenshot interpretation is unavailable.` : coverage ? 'The current release covers Sales and Inventory with one Accounting page supporting returns and refunds.' : 'Sign in to see the active documentation scope. Screenshot interpretation is unavailable.'}</div>
+        {coverage?.state === 'indexed_candidate' ? <p className="scope-note">Candidate preview · awaiting release review.</p> : null}
+        {coverage ? <p className="scope-note">{coverage.reviewed_workflows.length} workflow families accepted by human review in this release.</p> : null}
         <div className="boundary"><strong>A guide for your review.</strong><p>This pilot cannot read or change your Odoo database. Review guidance against your setup.</p><p>Questions and feedback are saved for pilot review. Keep customer and confidential data out of this pilot.</p></div>
         <footer>Documentation: Odoo · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a></footer>
       </aside>
@@ -151,7 +158,7 @@ function App() {
           <form onSubmit={login}><label>Pilot access key<input type="password" autoComplete="off" required maxLength={256} value={key} onChange={e => setKey(e.target.value)} /></label>
             <button disabled={busy}>{busy ? 'Signing in…' : 'Open workspace →'}</button></form></div> : <>
           <div className="workspace-heading"><div><div className="eyebrow">Your workspace</div><h2>From question to next step</h2></div><span className="readiness">{readiness}</span></div>
-          {!entries.length ? <div className="starter"><h3>What are you working on?</h3><p>Include the workflow and what has already happened. The assistant will ask when a detail changes the guidance.</p><div className="examples">{examples.map(example => <button className="example" key={example} onClick={() => { setQuestion(example); questionInput.current?.focus(); }}>{example}<span>↗</span></button>)}</div></div> : null}
+          {!entries.length ? <div className="starter"><h3>What are you working on?</h3><p>Include the workflow and what has already happened. The assistant will ask when a detail changes the guidance.</p><div className="examples">{(coverage && coverage.documents > 30 ? fullExamples : examples).map(example => <button className="example" key={example} onClick={() => { setQuestion(example); questionInput.current?.focus(); }}>{example}<span>↗</span></button>)}</div></div> : null}
           <div className="answers">{entries.map((entry, i) => <div key={entry.request_id} ref={i === entries.length - 1 ? latest : undefined}><AnswerCard entry={entry} expired={expired} /></div>)}</div>
           {pending ? <div className="loading" role="status"><span className="pulse" />Checking the documentation and supporting evidence…<p>{pending}</p></div> : null}
           <form className="composer" onSubmit={ask}><div className="composer-top"><label htmlFor="question">Your Odoo task</label><span className="supported-version">Odoo 19</span></div>

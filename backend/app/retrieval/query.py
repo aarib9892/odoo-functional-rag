@@ -19,6 +19,8 @@ async def retrieve_question(
     top_k: int = 5,
     *,
     client: AsyncOpenAI | None = None,
+    method: str = "dense",
+    expected_snapshot_id: str | None = None,
 ) -> dict:
     if not isinstance(question, str) or not question.strip():
         raise ValueError("Question must be a nonempty string")
@@ -26,6 +28,8 @@ async def retrieve_question(
         raise ValueError("Corpus name must be a nonempty string")
     if type(top_k) is not int or top_k < 1:
         raise ValueError("top_k must be a positive integer")
+    if method not in {"dense", "hybrid"}:
+        raise ValueError("Unsupported retrieval method")
 
     tokens = count_tokens(question)
     if tokens > 8192:
@@ -44,6 +48,8 @@ async def retrieve_question(
 
     if snapshot is None:
         raise ValueError("No active published snapshot for this corpus")
+    if expected_snapshot_id is not None and snapshot["snapshot_id"] != expected_snapshot_id:
+        raise ValueError("Active index differs from the approved release")
 
     config = EmbeddingConfig(**json.loads(snapshot["embedding_config"]))
     if config.dimensions != 1536 or config.config_id != snapshot["embedding_config_id"]:
@@ -62,7 +68,11 @@ async def retrieve_question(
     if vector is None:
         raise ValueError("Question embedding was not cached")
 
-    result = await search_dense(vector, config, corpus_name, top_k)
+    if method == "hybrid":
+        from app.retrieval.hybrid import search_hybrid
+        result = await search_hybrid(vector, config, question, corpus_name, top_k)
+    else:
+        result = await search_dense(vector, config, corpus_name, top_k)
     if result["snapshot_id"] != snapshot["snapshot_id"]:
         raise ValueError("Active snapshot changed during retrieval; retry the question")
 

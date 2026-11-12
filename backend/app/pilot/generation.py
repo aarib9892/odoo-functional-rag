@@ -50,9 +50,14 @@ class ProviderFailure(RuntimeError):
 
 
 class Generator:
-    def __init__(self, model: str, client: AsyncOpenAI, reasoning_effort: str | None = None):
+    def __init__(self, model: str, client: AsyncOpenAI, reasoning_effort: str | None = None, *, full_applications=False):
         self.model, self.client = model, client
         self.reasoning_effort = reasoning_effort
+        self.prompt = PROMPT
+        if full_applications:
+            self.prompt = PROMPT.replace('for Sales and Inventory.', 'for all application workflows.').replace(
+                'or broad Accounting.', 'or undocumented client customizations.')
+            self.prompt += "\nScreenshots are references only. Never infer details visible only in images.\n"
 
     async def parse(self, schema, instructions, payload):
         response = await self.client.responses.parse(
@@ -74,7 +79,7 @@ class Generator:
         return response.output_parsed, metadata
 
     async def draft(self, payload):
-        return await self.parse(DraftAnswer, PROMPT, payload)
+        return await self.parse(DraftAnswer, self.prompt, payload)
 
     async def review(self, payload):
         return await self.parse(SupportReview, REVIEW_PROMPT, payload)

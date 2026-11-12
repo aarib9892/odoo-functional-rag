@@ -18,7 +18,7 @@ def build_evidence(result: dict, settings, budget: int = 3500) -> list[dict]:
         raise InvalidEvidence("Published index differs from the reviewed pilot index")
     evidence = []
     seen = set()
-    for hit in result.get("context_hits", result["hits"])[:8]:
+    for hit in result.get("context_hits", result["hits"])[:12 if getattr(settings, 'full_applications', False) else 8]:
         record = hit["chunk_record"]
         chunk_id = record["chunk_id"]
         body = {k: v for k, v in record.items() if k != "chunk_id"}

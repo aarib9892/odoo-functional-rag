@@ -45,6 +45,12 @@ class Store:
                     PRIMARY KEY(key, window)
                 );
             """)
+        # Additive migration; old requests/history remain intact.
+        with self.connection() as db:
+            for table in ('sessions', 'requests'):
+                names = {r['name'] for r in db.execute(f'PRAGMA table_info({table})')}
+                if 'release_id' not in names:
+                    db.execute(f"ALTER TABLE {table} ADD COLUMN release_id TEXT NOT NULL DEFAULT 'pilot-30'")
         os.chmod(path, 0o600)
 
     @contextmanager
@@ -81,8 +87,8 @@ class Store:
         token = secrets.token_urlsafe(32)
         with self.connection() as db:
             db.execute("DELETE FROM sessions WHERE expires < ?", (time.time(),))
-            db.execute("INSERT INTO sessions VALUES (?, ?, ?, ?)",
-                       (digest(token), principal, digest(access_key), time.time() + settings.session_hours * 3600))
+            db.execute("INSERT INTO sessions (id, principal, key_hash, expires, release_id) VALUES (?, ?, ?, ?, ?)",
+                       (digest(token), principal, digest(access_key), time.time() + settings.session_hours * 3600, settings.release_id))
         return token
 
     def session(self, token, settings):
@@ -91,7 +97,7 @@ class Store:
         with self.connection() as db:
             row = db.execute("SELECT * FROM sessions WHERE id=? AND expires>?",
                              (digest(token), time.time())).fetchone()
-        if not row:
+        if not row or row["release_id"] != settings.release_id:
             return None
         key = settings.access_keys.get(row["principal"])
         if not key or not hmac.compare_digest(row["key_hash"], digest(key)):
@@ -102,10 +108,10 @@ class Store:
         with self.connection() as db:
             db.execute("DELETE FROM sessions WHERE id=?", (digest(token),))
 
-    def start(self, request_id, session_id, principal, question, version):
+    def start(self, request_id, session_id, principal, question, version, release_id="pilot-30"):
         with self.connection() as db:
-            db.execute("INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, NULL)",
-                       (request_id, session_id, time.time(), principal, question, version))
+            db.execute("INSERT INTO requests (id,session_id,created,principal,question,version,release_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (request_id, session_id, time.time(), principal, question, version, release_id))
 
     def finish(self, request_id, response=None, error=None, audit=None):
         with self.connection() as db:
@@ -141,7 +147,7 @@ class Store:
     def export(self):
         with self.connection() as db:
             rows = db.execute("""SELECT r.id AS request_id, r.created, r.question, r.version,
-                r.response, r.error, r.audit, r.principal, f.updated AS feedback_at,
+                r.response, r.error, r.audit, r.principal, r.release_id, f.updated AS feedback_at,
                 f.outcome, f.comment, f.task_minutes FROM requests r
                 LEFT JOIN feedback f ON f.request_id=r.id ORDER BY r.created""").fetchall()
         for row in rows:
