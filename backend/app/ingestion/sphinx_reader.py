@@ -76,7 +76,7 @@ def parse_diagnostics(text):
 
 
 @contextmanager
-def read_corpus(files, *, repository=None, commit=None):
+def read_corpus(files, *, repository=None, commit=None, full_applications=False):
     """Yield app, stored trees, source root and a stable diagnostics string."""
     if (repository is None) != (commit is None):
         raise ValueError("Supply both repository and commit for pinned includes")
@@ -127,6 +127,16 @@ def read_corpus(files, *, repository=None, commit=None):
         }.items():
             app.add_directive(name, directive, override=True)
         app.add_role("icon", icon_role)
+        if full_applications:
+            from app.expansion.parsing import FullCard, PreservedContainer, reference_only_html
+            from docutils.parsers.rst import roles
+            app.add_directive('card', FullCard, override=True)
+            for name in ('exercise', 'spoiler', 'h:div'):
+                app.add_directive(name, PreservedContainer, override=True)
+            app.env.settings['raw_enabled'] = True
+            # Raw HTML is converted to reference-only data, including locally declared raw roles.
+            roles.register_canonical_role('raw', reference_only_html)
+            roles.register_local_role('raw-html', reference_only_html)
 
         if include_sources is not None:
             app.env.pinned_include_sources = include_sources

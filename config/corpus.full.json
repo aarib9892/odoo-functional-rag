@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository_url": "https://github.com/odoo/documentation.git",
+    "odoo_version": "19.0",
+    "language": "en",
+    "commit": "c9202e68ae702daec981b47d0b6055191084ffa2"
+  },
+  "scope": {
+    "essentials": [
+      "content/applications/essentials.rst",
+      "content/applications/essentials"
+    ],
+    "finance": [
+      "content/applications/finance.rst",
+      "content/applications/finance"
+    ],
+    "general": [
+      "content/applications/general.rst",
+      "content/applications/general"
+    ],
+    "hr": [
+      "content/applications/hr.rst",
+      "content/applications/hr"
+    ],
+    "inventory_and_mrp": [
+      "content/applications/inventory_and_mrp.rst",
+      "content/applications/inventory_and_mrp"
+    ],
+    "marketing": [
+      "content/applications/marketing.rst",
+      "content/applications/marketing"
+    ],
+    "productivity": [
+      "content/applications/productivity.rst",
+      "content/applications/productivity"
+    ],
+    "sales": [
+      "content/applications/sales.rst",
+      "content/applications/sales"
+    ],
+    "services": [
+      "content/applications/services.rst",
+      "content/applications/services"
+    ],
+    "studio": [
+      "content/applications/studio.rst",
+      "content/applications/studio"
+    ],
+    "websites": [
+      "content/applications/websites.rst",
+      "content/applications/websites"
+    ]
+  }
+}

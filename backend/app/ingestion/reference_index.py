@@ -6,13 +6,16 @@ from sphinx.util import docname_join
 
 
 class ReferenceIndex:
-    def __init__(self, app, trees, repository):
+    def __init__(self, app, trees, repository, *, content_root=False):
         self.app = app
         self.trees = trees
         self.repository = Path(repository)
         self.standard = app.env.get_domain("std")
+        self.content_root = content_root
 
     def document(self, from_doc, target):
+        if self.content_root and target.startswith('/') and not target.startswith('/content/'):
+            target = '/content' + target
         docname = docname_join(from_doc, target)
         if docname.endswith(".rst"):
             docname = docname[:-4]
@@ -43,7 +46,9 @@ class ReferenceIndex:
         if result["resolution"] == "resolved":
             # Verify the native resolver can actually construct the reference.
             resolved = self.standard.resolve_xref(self.app.env, from_doc, self.app.builder,
-                                                 kind, target, node, node[0].deepcopy())
+                                                 kind, ('/content' + target if self.content_root and kind == 'doc'
+                                                     and target.startswith('/') and not target.startswith('/content/') else target),
+                                                 node, node[0].deepcopy())
             if resolved is None:
                 return {"resolution": "native_resolution_failed"}
             result["resolved_text"] = resolved.astext()

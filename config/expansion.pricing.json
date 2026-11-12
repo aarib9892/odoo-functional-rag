@@ -1,0 +1,14 @@
+{
+  "verified_date": "2026-11-07",
+  "currency": "USD",
+  "tier": "standard",
+  "embedding_model": "text-embedding-3-small",
+  "embedding_per_million": 0.02,
+  "generation_model": "gpt-6-luna",
+  "input_per_million": 0.10,
+  "output_per_million": 0.50,
+  "sources": [
+    "https://developers.openai.com/api/docs/models/text-embedding-3-small",
+    "https://developers.openai.com/api/docs/models/gpt-6-luna"
+  ]
+}
